@@ -1,6 +1,25 @@
 $(function () {
   var accuweatherAPIKey = "yZxRJ6ARJwGbAkussNJHylGLNE0ooE9G";
 
+  var weatherObject = {
+    cidade: "",
+    estado: "",
+    pais: "",
+    temperatura: "",
+    texto_clima: "",
+    icone_clima: ""
+  };
+
+  function preencherClimaAgora(cidade, estado, pais, temperatura, texto_clima, icone_clima) {
+    
+    var texto_local = cidade + ", " + estado +  ". " + pais;
+    $("#texto_local").text(texto_local);
+    $("#texto_clima").text(texto_clima);
+    $("#texto_temperatura").html(String(temperatura) + "&deg;");
+    
+    // texto_temperatura
+  }
+
   function pegarTempoAtual(localCode) {
     $.ajax({
       url: "http://dataservice.accuweather.com/currentconditions/v1/" + localCode + "?apikey=" + accuweatherAPIKey + "&language=pt-br",
@@ -8,7 +27,13 @@ $(function () {
       dataType: "json",
       success: function (data) {
 
-        console.log(data);
+        console.log("current conditions: ", data);
+
+        weatherObject.temperatura = data[0].Temperature.Metric.Value;
+        weatherObject.texto_clima = data[0].WeatherText;
+        weatherObject.icone_clima = "";
+
+        preencherClimaAgora(weatherObject.cidade, weatherObject.estado, weatherObject.pais, weatherObject.temperatura, weatherObject.texto_clima, weatherObject.icone_clima);
 
       },
       error: function () {
@@ -26,6 +51,17 @@ $(function () {
       dataType: "json",
       success: function (data) {
 
+        console.log("geoposition; ", data);
+
+        try {
+          weatherObject.cidade = data.ParentCity.LocalizedName;
+        } catch {
+          weatherObject.cidade = data.LocalizedName;
+        }
+
+        weatherObject.estado = data.AdministrativeArea.LocalizedName;
+        weatherObject.pais = data.Country.LocalizedName;
+        
         var localCode = data.Key;
         pegarTempoAtual(localCode);
 
@@ -40,8 +76,8 @@ $(function () {
 
   function pegarCoordenadasDoIp() {
 
-    var lat_padrao = -8.055393255494286;
-    var long_padrao = -34.88415317276026;
+    var lat_padrao = -8.048;
+    var long_padrao = -34.879;
 
     $.ajax({
       url: "http://www.geoplugin.net/json.gp",
