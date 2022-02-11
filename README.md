@@ -5,11 +5,13 @@ Repositório de uma página web para simular uma aplicação para exibir a previ
 
 ## :wrench: Recursos Utilizados
 
-- [Visual Studio Code v1.63.2](https://code.visualstudio.com/)
+- [Visual Studio Code](https://code.visualstudio.com/)
 - [HTML5](https://www.w3schools.com/html/)
 - [CSS3](https://www.w3schools.com/css/)
 - [Javascript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript)
 - [Bootstrap v4.0.0](https://getbootstrap.com/)
+- [Accuweather](https://developer.accuweather.com/apis/)
+- [Geoplugin](http://www.geoplugin.net/)
 
 ## :floppy_disk: Clonar Repositório
 
