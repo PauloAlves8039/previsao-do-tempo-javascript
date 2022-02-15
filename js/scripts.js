@@ -20,62 +20,127 @@ $(function () {
 
   }
 
+  function gerarGrafico(horas, temperaturas) {
+    Highcharts.chart("hourly_chart", {
+      chart: {
+        type: "line",
+      },
+      title: {
+        text: "Temperatura Hora a Hora",
+      },
+
+      xAxis: {
+        categories: horas,
+      },
+      yAxis: {
+        title: {
+          text: "Temperatura (°C)",
+        },
+      },
+      plotOptions: {
+        line: {
+          dataLabels: {
+            enabled: false,
+          },
+          enableMouseTracking: false,
+        },
+      },
+      series: [
+        {
+          showInLegend: false,
+          data: temperaturas,
+        },
+      ],
+    });
+  }
+
+  function pegarPrevisaoHoraAHora(localCode) {
+  
+    $.ajax({
+      url : "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" + localCode + "?apikey=" + accuweatherAPIKey +"&language=pt-br&metric=true",
+      type: "GET",
+      dataType: "json",
+      success: function(data){
+          
+          var horarios = [];
+          var temperaturas = [];
+
+          for (var a = 0; a < data.length; a++) {
+
+              var hora = new Date( data[a].DateTime ).getHours();
+
+              horarios.push( String(hora) + "h" );
+              temperaturas.push( data[a].Temperature.Value )
+              
+              gerarGrafico(horarios, temperaturas);
+              $('.refresh-loader').fadeOut();
+
+          }
+          
+      },
+      error: function(){
+          console.log("Erro");
+          gerarErro("Erro ao obter a previsão hora a hora");
+      
+      }  
+  });
+
+  }
+
   function preencherPrevisaoCincoDias(previsoes) {
 
     $("#info_5dias").html("");
-    var diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+        var diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 
-    for (var a = 0; a < previsoes.length; a++) {
-      
-      var dataHoje = new Date(previsoes[a].Date);
-      var dia_semana = diasSemana[ dataHoje.getDay() ];
+        for (var a = 0; a < previsoes.length; a++) {
 
-      var iconNumber = previsoes[a].Day.Icon <= 9 ? "0" + String(previsoes[a].Day.Icon) : String(previsoes[a].Day.Icon);
+            var dataHoje = new Date(previsoes[a].Date);
+            var dia_semana = diasSemana[ dataHoje.getDay() ];
 
-      iconeClima = "https://developer.accuweather.com/sites/default/files/" + iconNumber + "-s.png";
-      maxima = String(previsoes[a].Temperature.Maximum.Value);
-      minima = String(previsoes[a].Temperature.Minimum.Value);
+            var iconNumber = previsoes[a].Day.Icon <= 9 ? "0" + String(previsoes[a].Day.Icon) : String(previsoes[a].Day.Icon);
 
-      elementoHTMLDia =  '<div class="day col">';
-      elementoHTMLDia +=    '<div class="day_inner">';
-      elementoHTMLDia +=        '<div class="dayname">';
-      elementoHTMLDia +=              dia_semana;
-      elementoHTMLDia +=        '</div>';
-      elementoHTMLDia +=        '<div style="background-image: url(\'' + iconeClima + '\')" class="daily_weather_icon"></div>'   
-      elementoHTMLDia +=        '<div class="max_min_temp">';
-      elementoHTMLDia +=          minima + '&deg; / ' + maxima + '&deg;';    
-      elementoHTMLDia +=        '</div>';
-      elementoHTMLDia +=    '</div>';    
-      elementoHTMLDia += '</div>';       
+            iconeClima = "https://developer.accuweather.com/sites/default/files/" + iconNumber + "-s.png";
+            maxima = String(previsoes[a].Temperature.Maximum.Value);
+            minima = String(previsoes[a].Temperature.Minimum.Value);
+
+            elementoHTMLDia =  '<div class="day col">';
+            elementoHTMLDia +=    '<div class="day_inner">';
+            elementoHTMLDia +=        '<div class="dayname">';
+            elementoHTMLDia +=              dia_semana;
+            elementoHTMLDia +=        '</div>';
+            elementoHTMLDia +=        '<div style="background-image: url(\'' + iconeClima + '\')" class="daily_weather_icon"></div>'   
+            elementoHTMLDia +=        '<div class="max_min_temp">';
+            elementoHTMLDia +=          minima + '&deg; / ' + maxima + '&deg;';    
+            elementoHTMLDia +=        '</div>';
+            elementoHTMLDia +=    '</div>';    
+            elementoHTMLDia += '</div>';       
                 
-      $("#info_5dias").append(elementoHTMLDia);
-      elementoHTMLDia = "";
-
-    }
-
+            $("#info_5dias").append(elementoHTMLDia);
+            elementoHTMLDia = "";
+          
+        }
   }
 
   function pegarPrevisaoCincoDias(localCode) {
     
     $.ajax({
-      url: "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" + localCode + "?apikey=" + accuweatherAPIKey + "&language=pt-br&metric=true",
+      url : "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" + localCode + "?apikey=" + accuweatherAPIKey + "&language=pt-br&metric=true",
       type: "GET",
       dataType: "json",
-      success: function (data) {
-
-        console.log("5 day forecast: ", data);
-
+      success: function(data){
+          
         $("#texto_max_min").html( String(data.DailyForecasts[0].Temperature.Minimum.Value) + "&deg; / " + String(data.DailyForecasts[0].Temperature.Maximum.Value) + "&deg;");
-
-        preencherPrevisaoCincoDias(data.DailyForescasts);
-
-      },
-      error: function () {
-
-        console.log("Erro");
         
+        preencherPrevisaoCincoDias(data.DailyForecasts);
+          
       },
-    });
+      error: function(){
+        
+          console.log("Erro");
+          gerarErro("Erro ao obter a previsão de 5 dias");
+      
+      }  
+  });
 
   }
 
@@ -130,6 +195,7 @@ $(function () {
         var localCode = data.Key;
         pegarTempoAtual(localCode);
         pegarPrevisaoCincoDias(localCode);
+        pegarPrevisaoHoraAHora(localCode);
 
       },
       error: function () {
@@ -163,6 +229,7 @@ $(function () {
 
         console.log("Erro");
         pegarLocalUsuario(lat_padrao, long_padrao);
+
       },
     });
   }
