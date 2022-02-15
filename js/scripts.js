@@ -1,5 +1,7 @@
 $(function () {
+
   var accuweatherAPIKey = "yZxRJ6ARJwGbAkussNJHylGLNE0ooE9G";
+  var mapBoxToken = "pk.eyJ1IjoicGF1bG9qdW5pb3I1NDciLCJhIjoiY2t6bzFsajZxMzJvazJub2I2NTl1aWRtdiJ9.JWyDH_PV-gd-SLyCALLfyQ";
 
   var weatherObject = {
     cidade: "",
@@ -207,6 +209,33 @@ $(function () {
 
   }
 
+  function pegarCoordenadasDaPesquisa(input) {
+    
+    input = encodeURI(input);
+    $.ajax({
+      url:
+        "https://api.mapbox.com/geocoding/v5/mapbox.places/" + input + ".json?access_token=" + mapBoxToken,
+      type: "GET",
+      dataType: "json",
+      success: function (data) {
+
+        try {
+          var long = data.features[0].geometry.coordinates[0];
+          var lat = data.features[0].geometry.coordinates[1];
+          pegarLocalUsuario(lat, long);
+        } catch {
+          gerarErro("Erro na pesquisa de local");
+        }
+
+      },
+      error: function () {
+        console.log("Erro no Mapbox");
+        gerarErro("Erro na pesquisa de local");
+      },
+    });
+
+  }
+
   function pegarCoordenadasDoIp() {
 
     var lat_padrao = -8.048;
@@ -235,5 +264,17 @@ $(function () {
   }
 
   pegarCoordenadasDoIp();
+
+  $("#search-button").click(function () {
+
+    var local = $("input#local").val();
+
+    if (local) {
+      pegarCoordenadasDaPesquisa(local);
+    }else {
+      alert("Local inválido!");
+    }
+
+  });
 
 });
