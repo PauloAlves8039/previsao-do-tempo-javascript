@@ -76,7 +76,6 @@ $(function () {
       error: function () {
         console.log("Erro");
         gerarErro("Erro ao obter a previsão hora a hora");
-        $(".refresh-loader").fadeOut();
       },
     });
   }
@@ -138,7 +137,6 @@ $(function () {
       error: function () {
         console.log("Erro");
         gerarErro("Erro ao obter a previsão de 5 dias");
-        $(".refresh-loader").fadeOut();
       },
     });
   }
@@ -149,8 +147,6 @@ $(function () {
       type: "GET",
       dataType: "json",
       success: function (data) {
-        console.log("current conditions: ", data);
-
         weatherObject.temperatura = data[0].Temperature.Metric.Value;
         weatherObject.texto_clima = data[0].WeatherText;
 
@@ -164,7 +160,7 @@ $(function () {
       },
       error: function () {
         console.log("Erro");
-        $(".refresh-loader").fadeOut();
+        gerarErro("Erro ao obter clima atual");
       },
     });
   }
@@ -175,8 +171,6 @@ $(function () {
       type: "GET",
       dataType: "json",
       success: function (data) {
-        console.log("geoposition; ", data);
-
         try {
           weatherObject.cidade = data.ParentCity.LocalizedName;
         } catch {
@@ -193,7 +187,7 @@ $(function () {
       },
       error: function () {
         console.log("Erro");
-        $(".refresh-loader").fadeOut();
+        gerarErro("Erro no código do local");
       },
     });
   }
@@ -216,7 +210,6 @@ $(function () {
       error: function () {
         console.log("Erro no Mapbox");
         gerarErro("Erro na pesquisa de local");
-        $(".refresh-loader").fadeOut();
       },
     });
   }
@@ -241,6 +234,19 @@ $(function () {
         pegarLocalUsuario(lat_padrao, long_padrao);
       },
     });
+  }
+
+  function gerarErro(mensagem) {
+    if (!mensagem) {
+      mensagem = "Erro na solicitação";
+    }
+
+    $(".refresh-loader").hide();
+    $("#aviso-erro").text(mensagem);
+    $("#aviso-erro").slideDown();
+    window.setTimeout(function () {
+      $("#aviso-erro").slideUp();
+    }, 4000);
   }
 
   pegarCoordenadasDoIp();
