@@ -1,6 +1,6 @@
 $(function () {
-  var accuweatherAPIKey = "yZxRJ6ARJwGbAkussNJHylGLNE0ooE9G";
-  var mapBoxToken = "pk.eyJ1IjoicGF1bG9qdW5pb3I1NDciLCJhIjoiY2t6bzFsajZxMzJvazJub2I2NTl1aWRtdiJ9.JWyDH_PV-gd-SLyCALLfyQ";
+  var accuweatherAPIKey = "APIKey";
+  var mapBoxToken = "token";
 
   var weatherObject = {
     cidade: "",
